@@ -1,0 +1,130 @@
+<html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="normalize.css" />
+<link rel="stylesheet" type="text/css" href="set.css" />
+</head>
+
+<body>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="masonry.pkgd.min.js"></script>
+<script type="text/javascript" src="imagesloaded.pkgd.min.js"></script>
+
+<input type="text" name="search" id="search_box" class='search_box'/>
+<input type="submit" value="Search" class="search_button" />
+
+<div id="container"></div>
+
+<script>
+
+
+$(window).load(function() {
+$('#container').masonry({columnWidth: 1, singleMode: true, itemSelector:'.item'});
+});
+
+$(function()
+{
+$(".search_button").click(function()
+{
+var search_word = $("#search_box").val();
+if(search_word=='')
+{
+}
+else
+{
+var uri= "http://searx.me/?format=json&q="+search_word;
+        $(document).ready(function() {
+                $.ajax({
+                    url: uri,
+                    dataType: "text",
+                    success: function(data) {
+                        var json = $.parseJSON(data);
+                        $("#container").html('');
+                        $.each(json.results, function(i,data) {
+var url=data.url;
+var title=data.title;
+var host=data.host;
+var desc=data.content;
+var frame = "http://iframe.ly/api/iframely?&api_key=5cc8c7a9283d1ffa643073&url="+url;
+$.ajax({
+                    url: frame,
+                    dataType: "json",
+                    success: function(iframe) {
+var inimg=$.inArray("image", iframe.links[0].rel);
+var intmb=$.inArray("thumbnail", iframe.links[0].rel);
+var inapp=$.inArray("app", iframe.links[0].rel);
+var inplr=$.inArray("player", iframe.links[0].rel);
+if(iframe.meta.description)
+{var des=iframe.meta.description;}
+else
+{var des=desc;}
+
+if(inimg!="-1" || intmb!="-1")
+{
+var img=iframe.links[0].href;
+var imag=new Image();
+imag.src=img;
+
+$(imag).load(function() {
+if(imag.width>399)
+{
+var final="<div class='item'><div class='grid'><figure class='effect-milo'><img src='"+img+"' alt='img'/><figcaption><h2><span>"+title+"</span></h2><p>"+des+"</p><a href='"+url+"'>View more</a></figcaption></figure></div></div>";
+$("#container").append(final);
+$('#container').masonry( 'appended', final ).fadeIn();
+$('#container').masonry( 'layoutItems', final, isStill );
+}
+});
+}
+
+else if($.inArray("image", iframe.links[1].rel)!="-1")
+{
+var img=iframe.links[1].href;
+var imag=new Image();
+imag.src=img;
+$(imag).load(function() {
+if(imag.width>399)
+{
+var final="<div class='item'><div class='grid'><figure class='effect-milo'><img src='"+img+"' alt='img'/><figcaption><h2><span>"+title+"</span></h2><p>"+des+"</p><a href='"+url+"'>View more</a></figcaption></figure></div></div>";
+$("#container").append(final);
+$('#container').masonry( 'appended', final ).fadeIn();
+$('#container').masonry( 'layoutItems', final, isStill );
+}
+});
+}
+else if(inplr!="-1")
+{
+if(iframe.html)
+{
+var htm=iframe.html;
+}
+else
+{
+var htm=iframe.links[0].html;
+}
+var final="<div class='item'>"+htm+"</div>";
+$("#container").append(final);
+$('#container').masonry( 'appended', final ).fadeIn();
+$('#container').masonry( 'layoutItems', final, isStill );
+}
+else{
+var final="<div class='item' style='border-color: #000; border-width:1px; border-style: solid;'><div class='grid'><figure class='effect-moli'><img src='white.jpg' alt='img'/><figcaption><h2><span>"+title+"</span></h2><p>"+des+"</p><a href='"+url+"'>View more</a></figcaption></figure><div class='icon'><img src='http://www.google.com/s2/favicons?domain="+url+"'/></div></div></div>";
+$("#container").append(final);
+$('#container').masonry( 'appended', final ).fadeIn();
+$('#container').masonry( 'layoutItems', final, isStill );
+}
+
+
+
+}
+});
+});
+}
+});
+});
+}
+});
+});
+</script>
+</body>
+</html>
+
